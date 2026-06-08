@@ -20,7 +20,8 @@ PREJOIN_JOIN_BUTTON = '//button[contains(@data-tid, "prejoin-join-button") or co
 OOPS = '//*[@class=oops]'
 TRY_AGAIN_BUTTON = '//button[@translate-once="tryAgain"]'
 PARTICIPANTS_BUTTON = '//button[@id="roster-button"]'
-USE_TEAMS_ON_WEB_BUTTON = '//button[contains(text(), "Use Teams on the web") or contains(text(), "Continue on this browser")]'
+USE_TEAMS_ON_WEB_BUTTON = '//button[contains(text(), "Use Teams on the web") or contains(text(), "Continue on this browser") or contains(@aria-label, "web") or contains(@data-tid, "joinOnWeb")]'
+DISMISS_MODAL = '//button[contains(text(), "Got it") or contains(text(), "Dismiss") or contains(text(), "Not now") or contains(@aria-label, "Close") or contains(text(), "Close")]'
 GUEST_NAME_FIELD = '//input[contains(@placeholder, "name") or contains(@aria-label, "name") or contains(@id, "username") or @type="text"]'
 CURRENTLY_IN_MEETING = '//*[@id="page-content-wrapper"]/div[1]/div/calling-screen/div/div[2]/meeting-panel-components/calling-roster/div/div[4]/div/div[1]/accordion/div/accordion-section[2]/div/calling-roster-section/div/div[1]/button/span[3]'
 # Generic Leave/Hangup buttons for any Teams variant

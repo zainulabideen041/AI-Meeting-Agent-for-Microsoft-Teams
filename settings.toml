@@ -2,13 +2,13 @@
 
 # User Account
 
-email_id = "[EMAIL_ADDRESS]"
-password = "[PASSWORD]"
+email_id = "thegamer12415@gmail.com"
+password = "Zain@32145"
 
 # Direct Meeting Link (Optional)
 # If provided, the script will join this link after you log in.
 # If left empty, the script will look for joinable meetings on your Teams Calendar.
-meeting_link = "https://teams.microsoft.com/meet/49659054120188?p=eNamQZRq88z4dh5zwS"
+meeting_link = "https://teams.microsoft.com/meet/49374912287436?p=t762msEDLuDCTHEW6p"
 
 
 
@@ -30,13 +30,13 @@ timeout = 60
 # --- NEW SETTINGS FOR VOSK STT & NOTIFICATIONS ---
 
 # Whisper STT Settings
-whisper_model_size = "tiny"
+whisper_model_size = "medium"
 alert_keywords = ["attendance"]
 
 # Email Notification Settings
 # IMPORTANT: For Gmail, use an "App Password" not your regular account password.
-sender_email = "abc@gmail.com"
-sender_password = "[PASSWORD]"
-notification_email = "[EMAIL_ADDRESS]"
+sender_email = "thegamer12415@gmail.com"
+sender_password = "mbikgmjytmsaqpnr"
+notification_email = "zainulabideen4578@gmail.com"
 smtp_server = "smtp.gmail.com"
 smtp_port = 587

@@ -12,6 +12,18 @@ def try_again():
     wait_for_element_to_be_clickable(NEW_MEETING_BUTTON)
     
 
+def dismiss_modals():
+    """Attempts to click 'Got it', 'Dismiss', or other common Teams popups."""
+    try:
+        modals = browser.find_elements(By.XPATH, DISMISS_MODAL)
+        for modal in modals:
+            if modal.is_displayed():
+                modal.click()
+                print_message('Dismissed a modal popup', status_code.SUCCESS)
+                sleep(1)
+    except:
+        pass
+
 def wait_for_login():
     print_message('Please log in manually in the browser window...', status_code.LOADING)
     # Wait for the New Meeting button to appear (indicator of successful login/dashboard)
@@ -22,13 +34,23 @@ def wait_for_login():
 
 
 def join_via_link(link):
+    # Check if we are already in a meeting
+    try:
+        if browser.find_elements(By.XPATH, HANGUP_BUTTON):
+            print_message('Already in a meeting. Skipping navigation.', status_code.SUCCESS)
+            return
+    except:
+        pass
+
     print_message('Navigating to meeting link...', status_code.LOADING)
     browser.get(link)
     
     # Smarter detection: Is there a "Join now" or "Continue on browser" button?
     # We wait a bit for the page to redirect or show the choice
     seconds = 0
-    while seconds < 20:
+    while seconds < 40: # Increased timeout
+        dismiss_modals() # Keep dismissing annoying popups
+
         # Check if we are already on the pre-join screen
         try:
             if browser.find_elements(By.XPATH, PREJOIN_JOIN_BUTTON) or browser.find_elements(By.XPATH, GUEST_NAME_FIELD):
@@ -41,10 +63,11 @@ def join_via_link(link):
         try:
             web_buttons = browser.find_elements(By.XPATH, USE_TEAMS_ON_WEB_BUTTON)
             if web_buttons:
-                web_buttons[0].click()
+                # Use JS click to bypass potential overlays
+                browser.execute_script("arguments[0].click();", web_buttons[0])
                 print_message('Clicked "Join on Web"', status_code.SUCCESS)
                 sleep(5)
-                break
+                # After clicking web join, we usually land on pre-join screen shortly
         except:
             pass
             
@@ -68,32 +91,43 @@ def keep_finding(xpath, interval):
 
 
 def join_meeting():
+    # If already in meeting, skip
+    try:
+        if browser.find_elements(By.XPATH, HANGUP_BUTTON):
+            return
+    except:
+        pass
+
     print_message('Time to meet. Joining ...', status_code.LOADING)
-    sleep(10)
+    sleep(5)
+    dismiss_modals()
+    sleep(5)
     
     # Fail-safe camera off
     try:
-        camera_button = browser.find_element(By.XPATH, CAMERA_BUTTON)
-        camera_button.click()
-        print_message('Camera off', status_code.SUCCESS)
-        sleep(2)
+        camera_buttons = browser.find_elements(By.XPATH, CAMERA_BUTTON)
+        if camera_buttons:
+            camera_buttons[0].click()
+            print_message('Camera off', status_code.SUCCESS)
+            sleep(2)
     except:
         print_message('Camera button skipped or not found', status_code.LOADING)
 
     # Fail-safe microphone off
     try:
-        mic_button = browser.find_element(By.XPATH, MIC_BUTTON)
-        mic_button.click()
-        print_message('Microphone off', status_code.SUCCESS)
-        sleep(2)
+        mic_buttons = browser.find_elements(By.XPATH, MIC_BUTTON)
+        if mic_buttons:
+            mic_buttons[0].click()
+            print_message('Microphone off', status_code.SUCCESS)
+            sleep(2)
     except:
         print_message('Microphone button skipped or not found', status_code.LOADING)
 
     # Handle Guest Name Entry (if required)
     try:
-        name_field = browser.find_element(By.XPATH, GUEST_NAME_FIELD)
-        if name_field:
-            name_field.send_keys("Zain") # Using user's name
+        name_fields = browser.find_elements(By.XPATH, GUEST_NAME_FIELD)
+        if name_fields:
+            name_fields[0].send_keys("Zain Ul Abideen 2600531") # Using user's name
             print_message('Guest name entered', status_code.SUCCESS)
             sleep(2)
     except:
@@ -101,16 +135,20 @@ def join_meeting():
 
     # Join Now
     try:
-        wait_for_element_to_be_clickable(PREJOIN_JOIN_BUTTON, timeout=30)
-        browser.find_element(By.XPATH, PREJOIN_JOIN_BUTTON).click()
-        print_message('Join button clicked!', status_code.SUCCESS)
+        join_buttons = browser.find_elements(By.XPATH, PREJOIN_JOIN_BUTTON)
+        if join_buttons:
+            join_buttons[0].click()
+            print_message('Join button clicked!', status_code.SUCCESS)
+        
         print_message('Waiting for admission (Lobby or joining)...', status_code.LOADING)
         # Use a very long timeout (2 hours) to wait for the host to admit you
         wait_for_element_to_be_clickable(HANGUP_BUTTON, timeout=7200)
         print_message('Joined Meeting at {}'.format(datetime.now()) , status_code.SUCCESS)
     except Exception as e:
-        print_message('Could not join meeting room. Check if you are stuck in lobby.', status_code.FAILED)
-        raise e
+        # Check if we are already joined before raising error
+        if not browser.find_elements(By.XPATH, HANGUP_BUTTON):
+            print_message('Could not join meeting room. Check if you are stuck in lobby.', status_code.FAILED)
+            raise e
     
 
 def leave_meeting():
