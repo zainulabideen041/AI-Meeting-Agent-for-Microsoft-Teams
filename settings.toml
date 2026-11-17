@@ -3,7 +3,7 @@
 # User Account
 
 email_id = "thegamer12415@gmail.com"
-password = "Zain@32145"
+password = "YOUR_TEAMS_PASSWORD"
 
 # Direct Meeting Link (Optional)
 # If provided, the script will join this link after you log in.
@@ -36,7 +36,7 @@ alert_keywords = ["attendance"]
 # Email Notification Settings
 # IMPORTANT: For Gmail, use an "App Password" not your regular account password.
 sender_email = "thegamer12415@gmail.com"
-sender_password = "mbikgmjytmsaqpnr"
+sender_password = "YOUR_SMTP_APP_PASSWORD"
 notification_email = "zainulabideen4578@gmail.com"
 smtp_server = "smtp.gmail.com"
 smtp_port = 587
