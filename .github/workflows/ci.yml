@@ -128,16 +128,24 @@ jobs:
               except tomllib.TOMLDecodeError:
                   raise SystemExit("Tracked settings.toml is invalid TOML.") from None
 
+              placeholders = {
+                  "password": "YOUR_TEAMS_PASSWORD",
+                  "sender_password": "YOUR_SMTP_APP_PASSWORD",
+              }
+
               def has_password(section):
-                  return any(
-                      has_password(value) if isinstance(value, dict)
-                      else key.casefold() in {"password", "sender_password"}
-                      and bool(str(value).strip())
-                      for key, value in section.items()
-                  )
+                  for key, value in section.items():
+                      if isinstance(value, dict):
+                          if has_password(value):
+                              return True
+                          continue
+                      placeholder = placeholders.get(key.casefold())
+                      if placeholder is not None and value not in ("", placeholder):
+                          return True
+                  return False
 
               if has_password(config):
-                  raise SystemExit("Tracked settings.toml contains a populated password field. Rotate credentials and remove their values from Git.")
+                  raise SystemExit("Tracked settings.toml contains a password value that is not an approved placeholder. Rotate credentials and remove their values from Git.")
           PY
 
   project-checks:
